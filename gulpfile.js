@@ -1,20 +1,27 @@
 const gulp = require('gulp');
 const concat = require('gulp-concat');
+const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const cleanCSS = require('gulp-clean-css');
 const del = require('del');
 const browserSync = require('browser-sync').create();
 
-const cssFiles = [
+const norm = [
 	'./node_modules/normalize.css/normalize.css',
-	'./src/css/**/*.css'
+];
+
+const sassFiles = [
+	'./src/css/**/*.scss'
 ];
 
 const jsFiles = [
 	'./src/js/*.js'
 ];
+
 function styles(){
-	return gulp.src(cssFiles)
+	return gulp.src(norm)
+		.pipe(gulp.src(sassFiles))
+		.pipe(sass())
 		.pipe(concat('template.css'))
 		.pipe(autoprefixer({
 			browsers: ['last 2 versions'],
@@ -39,9 +46,9 @@ function watch(){
 		}
 		//tunnel: true
     });
-	gulp.watch('./src/css/**/*.css', styles);
+	gulp.watch('./src/css/**/*.scss', styles);
 	gulp.watch('./src/js/**/*.js', scripts);
-	gulp.watch('./*html', browserSync.reload)
+	gulp.watch('./*.html').on('change', browserSync.reload);
 }
 
 
@@ -54,7 +61,7 @@ gulp.task('scripts', scripts);
 gulp.task('watch', watch);
 gulp.task('clean', clean);
 
-/*сборка с удаление из папки build*/
+/*сборка с очисткой папки build*/
 gulp.task('build', gulp.series(clean, gulp.parallel(styles, scripts))
 					);
 
